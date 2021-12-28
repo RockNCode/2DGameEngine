@@ -1,0 +1,5 @@
+*.out
+assets
+libs
+.DS_Store
+gameengine
