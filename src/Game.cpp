@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 
 Game::Game() {
+    isRunning = false;
     std::cout << "Creating game object" <<std::endl;
 }
 Game::~Game() {
@@ -13,7 +14,7 @@ void Game::Initialize() {
         std::cerr << "Error initializing SDL " << std::endl;
         return;
     }
-    SDL_Window* window = SDL_CreateWindow(NULL,
+    window = SDL_CreateWindow(NULL,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         800,
@@ -25,15 +26,46 @@ void Game::Initialize() {
         return;
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window,-1,0);
+    renderer = SDL_CreateRenderer(window,-1,0);
 
     if(!renderer) {
         std::cerr << "Error creating renderer " << std::endl;
         return;
     }
+    isRunning = true;
 }
-void Game::Run(){}
-void Game::ProcessInput(){}
+void Game::ProcessInput() {
+    SDL_Event sdlEvent;
+    while(SDL_PollEvent(&sdlEvent)) {
+        switch( sdlEvent.type) {
+            case SDL_QUIT:
+                isRunning = false;
+                break;
+            case SDL_KEYDOWN:
+                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
+                    isRunning = false;
+                }
+                break;
+
+        }
+    }
+
+}
+
 void Game::Update(){}
+
 void Game::Render(){}
-void Game::Destroy(){}
+
+void Game::Run(){
+    while(isRunning) {
+        ProcessInput();
+        Update();
+        Render();
+    }
+}
+
+void Game::Destroy(){
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
+}
