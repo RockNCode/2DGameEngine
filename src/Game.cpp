@@ -3,17 +3,18 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
+#include "Logger.h"
 
 Game::Game() {
     isRunning = false;
-    std::cout << "Creating game object" <<std::endl;
+    Logger::Log("Creating game object" );
 }
 Game::~Game() {
-    std::cout << "Destroying game" << std::endl;
+    Logger::Log( "Destroying game" );
 }
 void Game::Initialize() {
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0 ) {
-        std::cerr << "Error initializing SDL " << std::endl;
+        Logger::Err("Error initializing SDL " );
         return;
     }
 
@@ -31,14 +32,14 @@ void Game::Initialize() {
         SDL_WINDOW_BORDERLESS
         );
     if (!window) {
-        std::cerr << "Error creating SDL window " << std::endl;
+        Logger::Err("Error creating SDL window " );
         return;
     }
 
     renderer = SDL_CreateRenderer(window,-1,0);
 
     if(!renderer) {
-        std::cerr << "Error creating renderer " << std::endl;
+        Logger::Err( "Error creating renderer " );
         return;
     }
 
@@ -71,7 +72,7 @@ glm::vec2 playerVelocity;
 void Game::Setup() {
     // initialize game objects
     playerPosition = glm::vec2(10.0,20.0);
-    playerVelocity = glm::vec2(10.0,0.0);
+    playerVelocity = glm::vec2(20.0,0.0);
 }
 
 
