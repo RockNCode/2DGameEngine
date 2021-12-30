@@ -76,6 +76,10 @@ void Game::Setup() {
 
 
 void Game::Update() {
+    // Locking render until at least MILLISECS_PER_FRAME have passed
+    while(!SDL_TICKS_PASSED(SDL_GetTicks(),millisecsPreviosFrame + MILLISECS_PER_FRAME));
+    millisecsPreviosFrame = SDL_GetTicks();
+
     playerPosition.x += playerVelocity.x;
     playerPosition.y += playerVelocity.y;
 }
