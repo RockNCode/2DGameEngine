@@ -3,15 +3,15 @@
 #include <ctime>
 #include <iomanip>
 
-void Logger::Log(const std::string& msg) {
+void Logger::printWithCurrentTimestamp(const std::string& msg,const std::string& prefix,int color) {
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
-    
-    std::cout << "\033[0;32mLOG: [ " << std::put_time(&tm, "%d-%b-%Y %H:%M:%S") << " ] "<< msg << std::endl;
 
+    std::cout << "\033[1;"<< color <<"m"<< prefix <<": [ " << std::put_time(&tm, "%d-%b-%Y %H:%M:%S") << " ] "<< msg << std::endl;
+}
+void Logger::Log(const std::string& msg) {
+    printWithCurrentTimestamp(msg,"LOG",32);
 }
 void Logger::Err(const std::string& msg) {
-    auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    std::cerr << "\033[0;33mERR: [ " << std::put_time(&tm, "%d-%b-%Y %H:%M:%S") << " ] "<< msg << std::endl;
+    printWithCurrentTimestamp(msg,"ERR",31);
 }
