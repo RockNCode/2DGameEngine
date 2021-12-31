@@ -1,5 +1,15 @@
+# Variables
+
+CC= g++
+COMPILER_FLAGS= -Wall -Wfatal-errors
+LANG_STD= -std=c++17
+LFLAGS= -lsdl2 -lsdl2_image -lsdl2_ttf -lsdl2_mixer -llua
+INCLUDEDDIR=-I"./libs"
+SRCDIR= src/*.cpp src/Game/*.cpp src/Logger/*.cpp
+OUTPUT=-o  gameengine
+
 build:
-	g++ -Wall -std=c++17 -lsdl2 -lsdl2_image -lsdl2_ttf -lsdl2_mixer -llua -I"./libs" src/*.cpp -o  gameengine;
+	$(CC) $(COMPILER_FLAGS) $(LANG_STD) $(LFLAGS) $(INCLUDEDDIR) $(SRCDIR) $(OUTPUT);
 
 run:
 	./gameengine
