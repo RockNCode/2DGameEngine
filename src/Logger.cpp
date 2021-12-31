@@ -7,7 +7,8 @@ void Logger::printWithCurrentTimestamp(const std::string& msg,const std::string&
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
 
-    std::cout << "\033[1;"<< color <<"m"<< prefix <<": [ " << std::put_time(&tm, "%d-%b-%Y %H:%M:%S") << " ] "<< msg << std::endl;
+    std::cout << "\033[1;"<< color <<"m"<< prefix <<": [ " << std::put_time(&tm, "%d-%b-%Y %H:%M:%S") 
+            << " ] "<< msg << "\033[0m" <<std::endl;
 }
 void Logger::Log(const std::string& msg) {
     printWithCurrentTimestamp(msg,"LOG",32);
