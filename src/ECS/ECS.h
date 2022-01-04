@@ -68,8 +68,68 @@ class System {
         template <typename TComponent> void RequireComponent();
 };
 
-class Registry {
+/////////////////////////////////////////////////////////////////////////////
+// Pool vector (contiguous data) of objects of type T
+/////////////////////////////////////////////////////////////////////////////
+class IPool{
+    public:
+        virtual ~IPool() {} ;
+};
+template <typename T>
+class Pool : public IPool {
+    private:
+        std::vector<T> data;
+    public:
+        Pool(int size=100)  {
+            data.resize(size);
+        }
+        virtual ~Pool() = default;
 
+        bool isEmpty() const {
+            return data.empty();
+        }
+
+        int GetSize() {
+            return data.size();
+        }
+
+        void resize(int n) {
+            data.resize(n);
+        }
+
+        void Clear() {
+            data.clear();
+        }
+
+        void Add(T object) {
+            data.push_back(object);
+        }
+
+        void Set(int index, T object) {
+            data[index] = object;
+        }
+
+        T& Get (int index ) {
+            return static_cast<T&>(data[index]);
+        }
+
+        T& operator [](unsigned int index) {
+            return data[index];
+        }
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// Manages the creation and destruction of entities adds systems and
+// components
+/////////////////////////////////////////////////////////////////////////////
+class Registry {
+    private:
+        int numEntities = 0;
+        // Vector of component pools, each pool has all the data for
+        // a certain component type. 
+        // Vector index = the component type id
+        // Pool index = entity id
+        std::vector<IPool*> componentPools;
 };
 
 template <typename TComponent>
