@@ -7,7 +7,9 @@ LFLAGS= -lsdl2 -lsdl2_image -lsdl2_ttf -lsdl2_mixer -llua
 INCLUDEDDIR=-I"./libs"
 SRCDIR =src/*.cpp \
 		src/Game/*.cpp \
-		src/Logger/*.cpp
+		src/Logger/*.cpp \
+		src/ECS/*.cpp \
+
 OUTPUT=gameengine
 
 build:
