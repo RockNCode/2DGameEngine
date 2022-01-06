@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <typeindex>
+#include <set>
 
 const unsigned int MAX_COMPONENTS = 32;
 
@@ -82,7 +83,7 @@ class Pool : public IPool {
     private:
         std::vector<T> data;
     public:
-        Pool(int size=100) const {
+        Pool(int size=100)  {
             data.resize(size);
         }
         virtual ~Pool() = default;
@@ -140,9 +141,18 @@ class Registry {
 
         std::unordered_map<std::type_index, System*> system;
 
+        // set of entities flagged to be added or removed in the next update.
+        std::set<Entity> entitiesToBeAdded;
+        std::set<Entity> entitiesToBeKilled;
+
+
+
     public:
         Registry() = default;
-        
+
+        Entity CreateEntity();
+
+        void Update();
 };
 
 template <typename TComponent>
