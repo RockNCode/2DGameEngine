@@ -139,7 +139,7 @@ class Registry {
         // vector index = entity id
         std::vector<Signature>  entityComponentSignatures;
 
-        std::unordered_map<std::type_index, System*> system;
+        std::unordered_map<std::type_index, System*> systems;
 
         // set of entities flagged to be added or removed in the next update.
         std::set<Entity> entitiesToBeAdded;
@@ -161,11 +161,44 @@ class Registry {
         template <typename TComponent> void RemoveComponent(Entity entity);
         // Checks if an entity has component TComponent
         template <typename TComponent> bool HasComponent(Entity entity) const;
-        void AddEntityToSystem(Entity entity);
 
+        // System functions
+        template<typename TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
+        template<typename TSystem> void RemoveSystem();
+        template<typename TSystem> bool HasSystem() const;
+        template<typename TSystem> TSystem& GetSystem() const;
 
+        // checks the component signature of an entity and add the entity to the systems
+        // that are interested in it
+        void AddEntityToSystems(Entity entity);
 };
 
+// Systems
+
+template<typename TSystem, typename ...TArgs>
+void Registry::AddSystem(TArgs&& ...args) {
+    TSystem* newSystem(new TSystem(std::forward<TArgs>(args)...));
+    systems.insert(std::make_pair(std::type_index(typeid(TSystem)),newSystem));
+}
+
+template<typename TSystem>
+void Registry::RemoveSystem() {
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    systems.erase(system);
+}
+
+template<typename TSystem>
+bool Registry::HasSystem() const {
+    return systems.find(std::type_index(typeid(TSystem))) != systems.end();
+}
+
+template<typename TSystem>
+TSystem& Registry::GetSystem() const {
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    return *(std::static_pointer_cast<TSystem>(system->second));
+}
+
+/// Component
 template <typename TComponent>
 void System::RequireComponent() {
     const auto componentId = Component<TComponent>::GetId();
