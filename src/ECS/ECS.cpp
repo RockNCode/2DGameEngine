@@ -1,5 +1,8 @@
 #include "ECS.h"
 #include "../Logger/Logger.h"
+
+int IComponent::nextId = 0;
+
 int Entity::GetId() const {
     return id;
 }
@@ -40,6 +43,7 @@ Entity Registry::CreateEntity(){
     return entity;
 
 }
+
 
 void Registry::Update() {
 
