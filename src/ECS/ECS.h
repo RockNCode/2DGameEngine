@@ -153,6 +153,17 @@ class Registry {
         Entity CreateEntity();
 
         void Update();
+
+        // Component management
+        template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+
+        // Ask to remove component from an entity
+        template <typename TComponent> void RemoveComponent(Entity entity);
+        // Checks if an entity has component TComponent
+        template <typename TComponent> bool HasComponent(Entity entity);
+        void AddEntityToSystem(Entity entity);
+
+
 };
 
 template <typename TComponent>
@@ -160,4 +171,48 @@ void System::RequireComponent() {
     const auto componentId = Component<TComponent>::GetId();
     componentSignature.set(componentId);
 }
+
+template <typename TComponent, typename ...TArgs>
+void Registry::AddComponent(Entity entity, TArgs&& ...args) {
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    if(componentId >= componentPools.size() ) {
+        componentPools.resize(componentId+1,nullptr);
+    }
+
+    if(componentPools[componentId] == nullptr) {
+        Pool<TComponent>* newComponentPool = new Pool<TComponent>();
+        componentPools[componentId] = newComponentPool;
+    }
+
+    Pool<TComponent>* componentPool = componentPools[componentId];
+
+    if(entityId >= componentPool.size()) {
+        componentPool->resize(numEntities);
+    }
+
+    TComponent newComponent(std::forward<TArgs>(args)...);
+
+    componentPool.Set(entityId,newComponent);
+
+    entityComponentSignatures[entityId].set(componentId);
+}
+
+template <typename TComponent>
+bool Registry::RemoveComponent(Entity entity){
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+    entityComponentSignatures[entityId].set(componentId,true);
+}
+
+template <typename TComponent>
+bool Registry::HasComponent(Entity entity){
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    return entityComponentSignatures[entityId].test(componentId);
+}
+
+
 #endif
