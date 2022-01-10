@@ -36,6 +36,10 @@ Entity Registry::CreateEntity(){
 
     Entity entity(entityId);
 
+    // Make sure that entitiesComponentSignature vector can accomodate the new entity
+    if(entityId >= entityComponentSignatures.size()){
+        entityComponentSignatures.resize(entityId+1);
+    }
     entitiesToBeAdded.insert(entity);
 
     Logger::Log("Entity created : " + std::to_string(entityId));
@@ -62,5 +66,8 @@ void Registry::AddEntityToSystems(Entity entity) {
 
 
 void Registry::Update() {
-
+    for(auto entity : entitiesToBeAdded) {
+        AddEntityToSystems(entity);
+    }
+    entitiesToBeAdded.clear();
 }

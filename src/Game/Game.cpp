@@ -8,6 +8,8 @@
 
 Game::Game() {
     isRunning = false;
+    registry = new Registry();
+
     Logger::Log("Creating game object" );
 }
 Game::~Game() {
@@ -69,6 +71,10 @@ void Game::ProcessInput() {
 
 
 void Game::Setup() {
+    // Create some entities
+    Entity tank = registry->CreateEntity();
+    Entity truck = registry->CreateEntity();
+
 }
 
 
