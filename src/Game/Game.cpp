@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include "../ECS/ECS.h"
 #include "../Logger/Logger.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/RigidBodyComponent.h"
 
 Game::Game() {
     isRunning = false;
@@ -73,7 +75,10 @@ void Game::ProcessInput() {
 void Game::Setup() {
     // Create some entities
     Entity tank = registry->CreateEntity();
-    Entity truck = registry->CreateEntity();
+
+    //add some components to the entity
+    registry->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+    registry->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
 
 }
 
