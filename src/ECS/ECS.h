@@ -278,20 +278,20 @@ TComponent& Registry::GetComponent(Entity entity) const{
 
 template <typename TComponent, typename ...TArgs>
 void Entity::AddComponent(TArgs&& ...args) {
-    this->registry->AddComponent<TComponent>(this,std::forward<TArgs>(args)...);
+    this->registry->AddComponent<TComponent>(*this,std::forward<TArgs>(args)...);
 }
 
 template <typename TComponent>
 void Entity::RemoveComponent() {
-    this->registry->RemoveComponent<TComponent>(this);
+    this->registry->RemoveComponent<TComponent>(*this);
 }
 template <typename TComponent>
 bool Entity::HasComponent() const {
-    return this->registry->HasComponent<TComponent>(this);
+    return this->registry->HasComponent<TComponent>(*this);
 }
 template <typename TComponent>
 TComponent& Entity::GetComponent() const {
-    return this->registry->GetComponent<TComponent>(this);
+    return this->registry->GetComponent<TComponent>(*this);
 }
 
 
