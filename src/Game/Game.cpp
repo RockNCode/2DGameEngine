@@ -81,7 +81,7 @@ void Game::Setup() {
 
     //add some components to the entity
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(10.0, 10.0));
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(10.0, 50.0));
 
 }
 
@@ -95,7 +95,7 @@ void Game::Update() {
     double deltaTime = (SDL_GetTicks() - millisecsPreviosFrame) / 1000.0 ;
     millisecsPreviosFrame = SDL_GetTicks();
 
-    registry->GetSystem<MovementSystem>().Update();
+    registry->GetSystem<MovementSystem>().Update(deltaTime);
 
     // update registry to process entities that are waiting to be added/removed
     registry->Update();
