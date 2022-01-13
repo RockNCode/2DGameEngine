@@ -7,6 +7,7 @@
 #include "../Logger/Logger.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Systems/MovementSystem.h"
 
 Game::Game() {
     isRunning = false;
@@ -73,12 +74,14 @@ void Game::ProcessInput() {
 
 
 void Game::Setup() {
+
+    registry->AddSystem<MovementSystem>();
     // Create some entities
     Entity tank = registry->CreateEntity();
 
     //add some components to the entity
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(10.0, 10.0));
 
 }
 
@@ -92,6 +95,10 @@ void Game::Update() {
     double deltaTime = (SDL_GetTicks() - millisecsPreviosFrame) / 1000.0 ;
     millisecsPreviosFrame = SDL_GetTicks();
 
+    registry->GetSystem<MovementSystem>().Update();
+
+    // update registry to process entities that are waiting to be added/removed
+    registry->Update();
 
 }
 
