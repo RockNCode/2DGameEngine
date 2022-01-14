@@ -1,22 +1,22 @@
 #ifndef ECS_H
 #define ECS_H
 
-#include <bitset>
+#include "../Logger/Logger.h"
 #include <vector>
+#include <bitset>
+#include <set>
 #include <unordered_map>
 #include <typeindex>
-#include <set>
-#include "../Logger/Logger.h"
+#include <memory>
 
 const unsigned int MAX_COMPONENTS = 32;
 
-///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Signature
-///////////////////////////////////////////////////////////////////////////
-// We use a bitset to track which components an entity has and also helps
-// track which entities a system is interested in
-///////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
+// We use a bitset (1s and 0s) to keep track of which components an entity has,
+// and also helps keep track of which entities a system is interested in.
+////////////////////////////////////////////////////////////////////////////////
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
 struct IComponent {
@@ -24,12 +24,12 @@ struct IComponent {
         static int nextId;
 };
 
-// Used to assign a unique id to component type
+// Used to assign a unique id to a component type
 template <typename T>
-class Component : public IComponent {
-    // returns unique id of Component<T>
+class Component: public IComponent {
     public:
-        static int GetId () {
+        // Returns the unique id of Component<T>
+        static int GetId() {
             static auto id = nextId++;
             return id;
         }
@@ -46,7 +46,7 @@ class Entity {
         bool operator == (const Entity& other) const { return id == other.id; }
         bool operator != (const Entity& other) const { return id != other.id; }
         bool operator > (const Entity& other) const { return id > other.id; }
-        bool operator < (const Entity& other) const { return id > other.id; }
+        bool operator < (const Entity& other) const { return id < other.id; }
 
         template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
         template <typename TComponent> void RemoveComponent();
@@ -106,7 +106,7 @@ class Pool : public IPool {
             return data.size();
         }
 
-        void resize(int n) {
+        void Resize(int n) {
             data.resize(n);
         }
 
@@ -239,7 +239,7 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
     std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
 
     if(entityId >= componentPool->GetSize()) {
-        componentPool->resize(numEntities);
+        componentPool->Resize(numEntities);
     }
 
     TComponent newComponent(std::forward<TArgs>(args)...);
@@ -254,7 +254,7 @@ template <typename TComponent>
 void Registry::RemoveComponent(Entity entity){
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
-    entityComponentSignatures[entityId].set(componentId,true);
+    entityComponentSignatures[entityId].set(componentId,false);
 }
 
 template <typename TComponent>
@@ -270,7 +270,7 @@ TComponent& Registry::GetComponent(Entity entity) const{
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
 
-    auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[entityId]);
+    auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
 
     return componentPool->Get(entityId);
 }

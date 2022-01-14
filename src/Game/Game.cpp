@@ -7,7 +7,10 @@
 #include "../Logger/Logger.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
+
 #include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
 
 Game::Game() {
     isRunning = false;
@@ -26,11 +29,10 @@ void Game::Initialize() {
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-
-    windowWidth = 800;
-    windowHeight = 600;
-
-    window = SDL_CreateWindow(NULL,
+    windowWidth = displayMode.w;
+    windowHeight = displayMode.h;
+    window = SDL_CreateWindow(
+        NULL,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         windowWidth,
@@ -74,38 +76,51 @@ void Game::ProcessInput() {
 
 
 void Game::Setup() {
-
+    // Add the sytems that need to be processed in our game
     registry->AddSystem<MovementSystem>();
-    // Create some entities
+    registry->AddSystem<RenderSystem>();
+
+    // Create an entity
     Entity tank = registry->CreateEntity();
-
-    //add some components to the entity
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(10.0, 50.0));
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
+    tank.AddComponent<SpriteComponent>(10, 10);
 
+    Entity truck = registry->CreateEntity();
+    truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
+    truck.AddComponent<SpriteComponent>(10, 50);
 }
+
 
 
 void Game::Update() {
-    // Locking render until at least MILLISECS_PER_FRAME have passed
-    int timeToWait = MILLISECS_PER_FRAME - ( SDL_GetTicks() - millisecsPreviosFrame);
-    if(timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME)
+    // If we are too fast, waste some time until we reach the MILLISECS_PER_FRAME
+    int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviosFrame);
+    if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) {
         SDL_Delay(timeToWait);
+    }
 
-    double deltaTime = (SDL_GetTicks() - millisecsPreviosFrame) / 1000.0 ;
+    // The difference in ticks since the last frame, converted to seconds
+    double deltaTime = (SDL_GetTicks() - millisecsPreviosFrame) / 1000.0;
+
+    // Store the "previous" frame time
     millisecsPreviosFrame = SDL_GetTicks();
 
-    registry->GetSystem<MovementSystem>().Update(deltaTime);
-
-    // update registry to process entities that are waiting to be added/removed
+    // Update the registry to process the entities that are waiting to be created/deleted
     registry->Update();
 
+    // Invoke all the systems that need to update
+    registry->GetSystem<MovementSystem>().Update(deltaTime);
 }
 
+
 void Game::Render() {
-    SDL_SetRenderDrawColor(renderer,21,21,21,255);
+    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
+    // Invoke all the systems that need to render
+    registry->GetSystem<RenderSystem>().Update(renderer);
 
     SDL_RenderPresent(renderer);
 }
