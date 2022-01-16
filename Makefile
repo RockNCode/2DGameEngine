@@ -9,6 +9,7 @@ SRCDIR =src/*.cpp \
 		src/Game/*.cpp \
 		src/Logger/*.cpp \
 		src/ECS/*.cpp \
+		src/AssetStore/*.cpp \
 
 OUTPUT=gameengine
 
