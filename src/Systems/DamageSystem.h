@@ -13,17 +13,20 @@ class DamageSystem: public System {
         }
 
         void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus) {
-            eventBus->SubscribeToEvent<CollisionEvent>(this, &DamageSystem::onCollision);
+            eventBus->SubscribeToEvent<CollisionEvent>(this, &DamageSystem::OnCollision);
         }
 
-        void onCollision(CollisionEvent& event) {
-            Logger::Log("The Damage system received an event collision between entities " + std::to_string(event.a.GetId()) + " and " + std::to_string(event.b.GetId()));
-            event.a.Kill();
-            event.b.Kill();
+        void OnCollision(CollisionEvent& event) {
+            std::string aId = std::to_string(event.a.GetId());
+            std::string bId = std::to_string(event.b.GetId());
+            Logger::Log("Collision event emitted: " + aId + " and " + bId);
+            
+            //event.a.Kill();
+            //event.b.Kill();
         }
 
         void Update() {
-            // TODO:...
+
         }
 };
 
